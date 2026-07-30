@@ -69,23 +69,28 @@ public class QueueService {
 
     private LocalTime calculateAppointmentTime(Clinic clinic, Integer tokenNumber) {
 
-        LocalTime appointmentTime = clinic.getOpeningTime();
-
+        LocalTime openingTime = clinic.getOpeningTime();
         LocalTime lunchStart = clinic.getLunchStart();
-
         LocalTime lunchEnd = clinic.getLunchEnd();
 
-        int minutesToAdd =
-                (tokenNumber - 1) * clinic.getAverageTimePerPatient();
+        int averageTime = clinic.getAverageTimePerPatient();
 
-        appointmentTime = appointmentTime.plusMinutes(minutesToAdd);
+        int minutesBeforeLunch =
+                (int) java.time.Duration.between(openingTime, lunchStart).toMinutes();
 
-        if (!appointmentTime.isBefore(lunchStart)
-                && appointmentTime.isBefore(lunchEnd)) {
+        int patientsBeforeLunch = minutesBeforeLunch / averageTime;
 
-            appointmentTime = lunchEnd;
+        if (tokenNumber <= patientsBeforeLunch) {
+
+            return openingTime.plusMinutes(
+                    (long) (tokenNumber - 1) * averageTime
+            );
         }
 
-        return appointmentTime;
+        int patientsAfterLunch = tokenNumber - patientsBeforeLunch - 1;
+
+        return lunchEnd.plusMinutes(
+                (long) patientsAfterLunch * averageTime
+        );
     }
 }
