@@ -21,4 +21,21 @@ public class ClinicService {
     public List<Clinic> getAllClinics() {
         return clinicRepository.findAll();
     }
+
+    public Clinic updateClinic(int id, Clinic clinic) {
+
+        Clinic existingClinic = clinicRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Clinic not found"));
+
+        existingClinic.setClinicName(clinic.getClinicName());
+        existingClinic.setDoctorName(clinic.getDoctorName());
+        existingClinic.setPhone(clinic.getPhone());
+        existingClinic.setOpeningTime(clinic.getOpeningTime());
+        existingClinic.setLunchStart(clinic.getLunchStart());
+        existingClinic.setLunchEnd(clinic.getLunchEnd());
+        existingClinic.setClosingTime(clinic.getClosingTime());
+        existingClinic.setAverageTimePerPatient(clinic.getAverageTimePerPatient());
+
+        return clinicRepository.save(existingClinic);
+    }
 }
