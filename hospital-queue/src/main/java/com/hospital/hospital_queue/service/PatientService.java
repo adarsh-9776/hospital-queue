@@ -6,6 +6,7 @@ import com.hospital.hospital_queue.repository.PatientRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+
 @Service
 public class PatientService {
 
@@ -26,4 +27,17 @@ public class PatientService {
     public Patient getPatientById(int id) {
         return patientRepository.findById(id).get();
     }
+    public Patient updatePatient(int id, Patient patient) {
+
+        Patient existingPatient = patientRepository.findById(id).get();
+
+        existingPatient.setName(patient.getName());
+        existingPatient.setPhone(patient.getPhone());
+        existingPatient.setAddress(patient.getAddress());
+
+        return patientRepository.save(existingPatient);
+    }
+
+
+
 }

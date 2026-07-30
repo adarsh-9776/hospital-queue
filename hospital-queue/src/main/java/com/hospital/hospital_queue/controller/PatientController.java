@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 public class PatientController {
@@ -16,11 +17,13 @@ public class PatientController {
     private final PatientService patientService;
 
     public PatientController(PatientService patientService) {
+
         this.patientService = patientService;
     }
 
     @PostMapping("/patients")
     public Patient addPatient(@RequestBody Patient patient) {
+
         return patientService.addPatient(patient);
     }
 
@@ -31,6 +34,12 @@ public class PatientController {
 
     @GetMapping("/patients/{id}")
     public Patient getPatientById(@PathVariable int id) {
+
         return patientService.getPatientById(id);
+    }
+
+    @PutMapping("/patients/{id}")
+    public Patient updatePatient(@PathVariable int id, @RequestBody Patient patient) {
+        return patientService.updatePatient(id, patient);
     }
 }
