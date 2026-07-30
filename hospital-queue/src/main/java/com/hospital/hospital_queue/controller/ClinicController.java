@@ -6,6 +6,8 @@ import com.hospital.hospital_queue.service.ClinicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/clinic")
 public class ClinicController {
@@ -16,5 +18,10 @@ public class ClinicController {
     @PostMapping
     public Clinic saveClinic(@RequestBody Clinic clinic) {
         return clinicService.saveClinic(clinic);
+    }
+
+    @GetMapping
+    public List<Clinic> getAllClinics() {
+        return clinicService.getAllClinics();
     }
 }

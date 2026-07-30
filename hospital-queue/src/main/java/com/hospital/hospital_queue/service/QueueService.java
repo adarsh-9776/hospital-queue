@@ -1,21 +1,46 @@
 package com.hospital.hospital_queue.service;
 
+import com.hospital.hospital_queue.model.Clinic;
 import com.hospital.hospital_queue.model.Queue;
+import com.hospital.hospital_queue.repository.ClinicRepository;
 import com.hospital.hospital_queue.repository.QueueRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import java.time.LocalTime;
+
 @Service
 public class QueueService {
 
     private final QueueRepository queueRepository;
+    private final ClinicRepository clinicRepository;
 
-    public QueueService(QueueRepository queueRepository) {
+    public QueueService(QueueRepository queueRepository,
+                        ClinicRepository clinicRepository) {
         this.queueRepository = queueRepository;
+        this.clinicRepository = clinicRepository;
     }
 
     public Queue addQueue(Queue queue) {
+
+        Integer lastToken = queueRepository.getLastTokenNumberByClinicId(
+                queue.getClinic().getId()
+        );
+
+        Integer newToken = lastToken + 1;
+
+        queue.setTokenNumber(newToken);
+
+        Clinic clinic = clinicRepository.findById(queue.getClinic().getId()).get();
+
+        LocalTime appointmentTime =
+                calculateAppointmentTime(clinic, newToken);
+
+        queue.setAppointmentTime(appointmentTime);
+
+        queue.setStatus("WAITING");
+
         return queueRepository.save(queue);
     }
 
@@ -33,12 +58,34 @@ public class QueueService {
 
         existingQueue.setTokenNumber(queue.getTokenNumber());
         existingQueue.setStatus(queue.getStatus());
-        existingQueue.setWaitingTime(queue.getWaitingTime());
+        existingQueue.setAppointmentTime(queue.getAppointmentTime());
 
         return queueRepository.save(existingQueue);
     }
 
     public void deleteQueue(int id) {
         queueRepository.deleteById(id);
+    }
+
+    private LocalTime calculateAppointmentTime(Clinic clinic, Integer tokenNumber) {
+
+        LocalTime appointmentTime = clinic.getOpeningTime();
+
+        LocalTime lunchStart = clinic.getLunchStart();
+
+        LocalTime lunchEnd = clinic.getLunchEnd();
+
+        int minutesToAdd =
+                (tokenNumber - 1) * clinic.getAverageTimePerPatient();
+
+        appointmentTime = appointmentTime.plusMinutes(minutesToAdd);
+
+        if (!appointmentTime.isBefore(lunchStart)
+                && appointmentTime.isBefore(lunchEnd)) {
+
+            appointmentTime = lunchEnd;
+        }
+
+        return appointmentTime;
     }
 }

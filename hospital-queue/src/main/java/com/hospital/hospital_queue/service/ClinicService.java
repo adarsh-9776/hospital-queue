@@ -5,6 +5,8 @@ import com.hospital.hospital_queue.model.Clinic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ClinicService {
 
@@ -14,5 +16,9 @@ public class ClinicService {
 
     public Clinic saveClinic(Clinic clinic) {
         return clinicRepository.save(clinic);
+    }
+
+    public List<Clinic> getAllClinics() {
+        return clinicRepository.findAll();
     }
 }

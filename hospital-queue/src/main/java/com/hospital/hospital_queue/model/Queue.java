@@ -2,6 +2,12 @@ package com.hospital.hospital_queue.model;
 import com.hospital.hospital_queue.model.Patient;
 import jakarta.persistence.*;
 
+import java.time.LocalTime;
+
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import com.hospital.hospital_queue.model.Clinic;
+
 
 @Entity
 public class Queue {
@@ -14,11 +20,20 @@ public class Queue {
 
     private String status;
 
-    private Integer waitingTime;
+    private LocalTime appointmentTime;
 
 
     @ManyToOne
+    @JoinColumn(name = "patient_id")
     private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
+
+    public Clinic getClinic() {
+        return clinic;
+    }
 
     public Integer getId() {
         return id;
@@ -44,12 +59,12 @@ public class Queue {
         this.status = status;
     }
 
-    public Integer getWaitingTime() {
-        return waitingTime;
+    public LocalTime getAppointmentTime() {
+        return appointmentTime;
     }
 
-    public void setWaitingTime(Integer waitingTime) {
-        this.waitingTime = waitingTime;
+    public void setAppointmentTime(LocalTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
     }
 
     public Patient getPatient() {
