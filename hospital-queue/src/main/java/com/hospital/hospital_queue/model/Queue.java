@@ -3,6 +3,7 @@ import com.hospital.hospital_queue.model.Patient;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
@@ -21,6 +22,7 @@ public class Queue {
     private String status;
 
     private LocalTime appointmentTime;
+    private LocalDate queueDate;
 
 
     @ManyToOne
@@ -75,5 +77,13 @@ public class Queue {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public LocalDate getQueueDate() {
+        return queueDate;
+    }
+
+    public void setQueueDate(LocalDate queueDate) {
+        this.queueDate = queueDate;
     }
 }

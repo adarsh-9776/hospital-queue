@@ -1,6 +1,6 @@
 package com.hospital.hospital_queue.model;
 
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +13,7 @@ public class Patient {
     private Long id;
 
     private String name;
+    @Column(unique = true)
     private String phone;
     private String address;
 

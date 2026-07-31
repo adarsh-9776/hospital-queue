@@ -38,8 +38,16 @@ public class PatientController {
         return patientService.getPatientById(id);
     }
 
+    @GetMapping("/phone/{phone}")
+    public List<Patient> getPatientByPhone(@PathVariable String phone) {
+        return patientService.getPatientByPhone(phone);
+    }
+
     @PutMapping("/patients/{id}")
     public Patient updatePatient(@PathVariable int id, @RequestBody Patient patient) {
         return patientService.updatePatient(id, patient);
     }
+
+
+
 }

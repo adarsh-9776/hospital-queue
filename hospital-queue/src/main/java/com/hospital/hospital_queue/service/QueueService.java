@@ -6,6 +6,7 @@ import com.hospital.hospital_queue.repository.ClinicRepository;
 import com.hospital.hospital_queue.repository.QueueRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import java.time.LocalTime;
@@ -38,6 +39,7 @@ public class QueueService {
                 calculateAppointmentTime(clinic, newToken);
 
         queue.setAppointmentTime(appointmentTime);
+        queue.setQueueDate(LocalDate.now());
 
         queue.setStatus("WAITING");
 
@@ -105,6 +107,42 @@ public class QueueService {
 
         return lunchEnd.plusMinutes(
                 (long) patientsAfterLunch * averageTime
+        );
+    }
+
+    public List<Queue> getTodayQueues(Integer clinicId) {
+        return queueRepository.findByClinicIdAndQueueDateOrderByTokenNumberAsc(
+                clinicId,
+                LocalDate.now()
+        );
+    }
+
+    public List<Queue> searchTodayQueueByPhone(String phone) {
+        return queueRepository.findByPatientPhoneAndQueueDate(
+                phone,
+                LocalDate.now()
+        );
+    }
+    public List<Queue> getTodayWaitingQueues(Integer clinicId) {
+        return queueRepository.findByClinicIdAndQueueDateAndStatusOrderByTokenNumberAsc(
+                clinicId,
+                LocalDate.now(),
+                "WAITING"
+        );
+    }
+
+    public List<Queue> getTodayCompletedQueues(Integer clinicId) {
+        return queueRepository.findByClinicIdAndQueueDateAndStatus(
+                clinicId,
+                LocalDate.now(),
+                "COMPLETED"
+        );
+    }
+
+    public long getTodayQueueCount(Integer clinicId) {
+        return queueRepository.countByClinicIdAndQueueDate(
+                clinicId,
+                LocalDate.now()
         );
     }
 }

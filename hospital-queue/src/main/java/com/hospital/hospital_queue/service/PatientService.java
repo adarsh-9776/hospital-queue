@@ -17,6 +17,13 @@ public class PatientService {
     }
 
     public Patient addPatient(Patient patient) {
+
+        List<Patient> existingPatients = patientRepository.findByPhone(patient.getPhone());
+
+        if (!existingPatients.isEmpty()) {
+            return existingPatients.get(0);
+        }
+
         return patientRepository.save(patient);
     }
 
@@ -36,6 +43,10 @@ public class PatientService {
         existingPatient.setAddress(patient.getAddress());
 
         return patientRepository.save(existingPatient);
+    }
+
+    public List<Patient> getPatientByPhone(String phone) {
+        return patientRepository.findByPhone(phone);
     }
 
 

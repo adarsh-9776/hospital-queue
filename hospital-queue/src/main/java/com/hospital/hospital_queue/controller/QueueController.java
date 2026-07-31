@@ -47,4 +47,28 @@ public class QueueController {
 
         return "Queue deleted successfully";
     }
+
+    @GetMapping("queue/today/{clinicId}")
+    public List<Queue> getTodayQueues(@PathVariable Integer clinicId) {
+        return queueService.getTodayQueues(clinicId);
+    }
+
+    @GetMapping("/queue/search/{phone}")
+    public List<Queue> searchTodayQueueByPhone(@PathVariable String phone) {
+        return queueService.searchTodayQueueByPhone(phone);
+    }
+
+    @GetMapping("/queue/waiting/{clinicId}")
+    public List<Queue> getTodayWaitingQueues(@PathVariable Integer clinicId) {
+        return queueService.getTodayWaitingQueues(clinicId);
+    }
+    @GetMapping("/queue/completed/{clinicId}")
+    public List<Queue> getTodayCompletedQueues(@PathVariable Integer clinicId) {
+        return queueService.getTodayCompletedQueues(clinicId);
+    }
+
+    @GetMapping("/queue/count/{clinicId}")
+    public long getTodayQueueCount(@PathVariable Integer clinicId) {
+        return queueService.getTodayQueueCount(clinicId);
+    }
 }
