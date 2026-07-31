@@ -51,7 +51,16 @@ public class QueueService {
 
     public List<Queue> getQueuesByClinicId(int clinicId) {
         return queueRepository.findByClinicIdOrderByTokenNumberAsc(clinicId);
+
     }
+
+        public Queue getCurrentPatient(Integer clinicId){
+            return queueRepository.findFirstByClinicIdAndStatusOrderByTokenNumberAsc(
+                    clinicId,
+                    "CALLED"
+            );
+        }
+
 
     public Queue getQueueById(int id) {
         return queueRepository.findById(id).get();

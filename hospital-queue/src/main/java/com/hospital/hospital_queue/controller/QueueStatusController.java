@@ -26,6 +26,11 @@ public class QueueStatusController {
         return queueService.getQueuesByClinicId(clinicId);
     }
 
+    @GetMapping("/current/{clinicId}")
+    public Queue getCurrentPatient(@PathVariable Integer clinicId) {
+        return queueService.getCurrentPatient(clinicId);
+    }
+
     @PutMapping("/{id}/called")
     public Queue callPatient(@PathVariable int id) {
         Queue queue = queueService.getQueueById(id);

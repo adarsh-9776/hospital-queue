@@ -12,4 +12,9 @@ public interface QueueRepository extends JpaRepository<Queue, Integer> {
 
     List<Queue> findByClinicIdOrderByTokenNumberAsc(Integer clinicId);
 
+    Queue findFirstByClinicIdAndStatusOrderByTokenNumberAsc(
+            Integer clinicId,
+            String status
+    );
+
 }
