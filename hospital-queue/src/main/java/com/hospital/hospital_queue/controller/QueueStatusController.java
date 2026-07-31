@@ -4,6 +4,8 @@ import com.hospital.hospital_queue.model.Queue;
 import com.hospital.hospital_queue.service.QueueService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/queue-status")
 public class QueueStatusController {
@@ -17,6 +19,11 @@ public class QueueStatusController {
     @GetMapping("/{id}")
     public Queue getQueueStatus(@PathVariable int id) {
         return queueService.getQueueById(id);
+    }
+
+    @GetMapping("/clinic/{clinicId}")
+    public List<Queue> getQueuesByClinic(@PathVariable int clinicId) {
+        return queueService.getQueuesByClinicId(clinicId);
     }
 
     @PutMapping("/{id}/called")

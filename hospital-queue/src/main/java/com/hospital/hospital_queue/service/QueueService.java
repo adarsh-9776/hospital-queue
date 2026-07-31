@@ -45,7 +45,12 @@ public class QueueService {
     }
 
     public List<Queue> getAllQueues() {
+
         return queueRepository.findAll();
+    }
+
+    public List<Queue> getQueuesByClinicId(int clinicId) {
+        return queueRepository.findByClinicIdOrderByTokenNumberAsc(clinicId);
     }
 
     public Queue getQueueById(int id) {
