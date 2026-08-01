@@ -44,4 +44,29 @@ public interface QueueRepository extends JpaRepository<Queue, Integer> {
             LocalDate queueDate
     );
 
+    long countByClinicIdAndQueueDateAndStatus(
+            Integer clinicId,
+            LocalDate queueDate,
+            String status
+    );
+
+    Queue findFirstByClinicIdAndQueueDateAndStatusOrderByTokenNumberAsc(
+            Integer clinicId,
+            LocalDate queueDate,
+            String status
+    );
+
+    Queue findFirstByClinicIdAndQueueDateAndStatus(
+            Integer clinicId,
+            LocalDate queueDate,
+            String status
+    );
+
+    List<Queue> findByClinicIdOrderByQueueDateDescTokenNumberAsc(Integer clinicId);
+
+    List<Queue> findByClinicIdAndStatusOrderByQueueDateDescTokenNumberAsc(
+            Integer clinicId,
+            String status
+    );
+
 }

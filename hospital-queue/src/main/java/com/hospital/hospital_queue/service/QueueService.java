@@ -1,5 +1,6 @@
 package com.hospital.hospital_queue.service;
 
+import com.hospital.hospital_queue.dto.DashboardSummaryResponse;
 import com.hospital.hospital_queue.model.Clinic;
 import com.hospital.hospital_queue.model.Queue;
 import com.hospital.hospital_queue.repository.ClinicRepository;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import java.time.LocalTime;
+import com.hospital.hospital_queue.exception.ResourceNotFoundException;
 
 @Service
 public class QueueService {
@@ -65,12 +67,19 @@ public class QueueService {
 
 
     public Queue getQueueById(int id) {
-        return queueRepository.findById(id).get();
+
+        return queueRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Queue not found with id: " + id)
+                );
     }
 
     public Queue updateQueue(int id, Queue queue) {
 
-        Queue existingQueue = queueRepository.findById(id).get();
+        Queue existingQueue = queueRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Queue not found with id: " + id)
+                );
 
         existingQueue.setTokenNumber(queue.getTokenNumber());
         existingQueue.setStatus(queue.getStatus());
@@ -80,7 +89,13 @@ public class QueueService {
     }
 
     public void deleteQueue(int id) {
-        queueRepository.deleteById(id);
+
+        Queue queue = queueRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Queue not found with id: " + id)
+                );
+
+        queueRepository.delete(queue);
     }
 
     private LocalTime calculateAppointmentTime(Clinic clinic, Integer tokenNumber) {
@@ -145,4 +160,122 @@ public class QueueService {
                 LocalDate.now()
         );
     }
+
+    public DashboardSummaryResponse getDashboardSummary(Integer clinicId) {
+
+        DashboardSummaryResponse response = new DashboardSummaryResponse();
+
+        response.setTotalPatients(
+                queueRepository.countByClinicIdAndQueueDate(
+                        clinicId,
+                        LocalDate.now()
+                )
+        );
+
+        response.setWaitingPatients(
+                queueRepository.countByClinicIdAndQueueDateAndStatus(
+                        clinicId,
+                        LocalDate.now(),
+                        "WAITING"
+                )
+        );
+
+        response.setCalledPatients(
+                queueRepository.countByClinicIdAndQueueDateAndStatus(
+                        clinicId,
+                        LocalDate.now(),
+                        "CALLED"
+                )
+        );
+
+        response.setCompletedPatients(
+                queueRepository.countByClinicIdAndQueueDateAndStatus(
+                        clinicId,
+                        LocalDate.now(),
+                        "COMPLETED"
+                )
+        );
+
+        return response;
+    }
+
+    public Queue callNextPatient(Integer clinicId) {
+
+        Queue queue = queueRepository
+                .findFirstByClinicIdAndQueueDateAndStatusOrderByTokenNumberAsc(
+                        clinicId,
+                        LocalDate.now(),
+                        "WAITING"
+                );
+
+        if (queue == null) {
+            throw new ResourceNotFoundException(
+                    "No waiting patient found for clinic id: " + clinicId
+            );
+        }
+
+        queue.setStatus("CALLED");
+
+        return queueRepository.save(queue);
+    }
+
+    public Queue completeCurrentPatient(Integer clinicId) {
+
+        Queue queue = queueRepository
+                .findFirstByClinicIdAndQueueDateAndStatus(
+                        clinicId,
+                        LocalDate.now(),
+                        "CALLED"
+                );
+
+        if (queue == null) {
+            throw new ResourceNotFoundException(
+                    "No called patient found for clinic id: " + clinicId
+            );
+        }
+
+        queue.setStatus("COMPLETED");
+
+        return queueRepository.save(queue);
+    }
+
+    public Queue getCurrentCalledPatient(Integer clinicId) {
+
+        return queueRepository.findFirstByClinicIdAndQueueDateAndStatus(
+                clinicId,
+                LocalDate.now(),
+                "CALLED"
+        );
+    }
+
+    public Queue cancelQueue(Integer queueId) {
+
+        Queue queue = queueRepository.findById(queueId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Queue not found with id: " + queueId)
+                );
+
+
+
+        queue.setStatus("CANCELLED");
+
+        return queueRepository.save(queue);
+    }
+
+    public List<Queue> getQueueHistory(Integer clinicId) {
+
+        return queueRepository.findByClinicIdOrderByQueueDateDescTokenNumberAsc(clinicId);
+    }
+
+    public List<Queue> getQueuesByStatus(Integer clinicId, String status) {
+
+        return queueRepository
+                .findByClinicIdAndStatusOrderByQueueDateDescTokenNumberAsc(
+                        clinicId,
+                        status
+                );
+    }
+
+
 }
+
