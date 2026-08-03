@@ -27,11 +27,13 @@ public class QueueService {
 
     public Queue addQueue(Queue queue) {
 
-        Integer lastToken = queueRepository.getLastTokenNumberByClinicId(
-                queue.getClinic().getId()
+        Integer lastToken = queueRepository.getLastTokenNumberByClinicIdAndDate(
+                queue.getClinic().getId(),
+                LocalDate.now()
         );
 
         Integer newToken = lastToken + 1;
+
 
         queue.setTokenNumber(newToken);
 
@@ -58,12 +60,12 @@ public class QueueService {
 
     }
 
-        public Queue getCurrentPatient(Integer clinicId){
-            return queueRepository.findFirstByClinicIdAndStatusOrderByTokenNumberAsc(
-                    clinicId,
-                    "CALLED"
-            );
-        }
+    public Queue getCurrentPatient(Integer clinicId) {
+        return queueRepository.findFirstByClinicIdAndStatusOrderByTokenNumberAsc(
+                clinicId,
+                "CALLED"
+        );
+    }
 
 
     public Queue getQueueById(int id) {
@@ -138,6 +140,7 @@ public class QueueService {
                 LocalDate.now()
         );
     }
+
     public List<Queue> getTodayWaitingQueues(Integer clinicId) {
         return queueRepository.findByClinicIdAndQueueDateAndStatusOrderByTokenNumberAsc(
                 clinicId,
@@ -221,10 +224,10 @@ public class QueueService {
 
     public Queue completeCurrentPatient(Integer clinicId) {
 
+
         Queue queue = queueRepository
-                .findFirstByClinicIdAndQueueDateAndStatus(
+                .findFirstByClinicIdAndStatusOrderByTokenNumberAsc(
                         clinicId,
-                        LocalDate.now(),
                         "CALLED"
                 );
 
@@ -237,6 +240,7 @@ public class QueueService {
         queue.setStatus("COMPLETED");
 
         return queueRepository.save(queue);
+
     }
 
     public Queue getCurrentCalledPatient(Integer clinicId) {

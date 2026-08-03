@@ -10,8 +10,16 @@ import java.time.LocalDate;
 
 
 public interface QueueRepository extends JpaRepository<Queue, Integer> {
-    @Query("SELECT COALESCE(MAX(q.tokenNumber), 0) FROM Queue q WHERE q.clinic.id = :clinicId")
-    Integer getLastTokenNumberByClinicId(@Param("clinicId") Integer clinicId);
+    @Query("""
+SELECT COALESCE(MAX(q.tokenNumber), 0)
+FROM Queue q
+WHERE q.clinic.id = :clinicId
+AND q.queueDate = :queueDate
+""")
+    Integer getLastTokenNumberByClinicIdAndDate(
+            @Param("clinicId") Integer clinicId,
+            @Param("queueDate") LocalDate queueDate
+    );
 
     List<Queue> findByClinicIdOrderByTokenNumberAsc(Integer clinicId);
 
