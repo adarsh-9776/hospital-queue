@@ -41,7 +41,11 @@ public class JwtUtil {
     }
 
     public boolean isTokenValid(String token, String username) {
-        return extractUsername(token).equals(username);
+        try {
+            return extractUsername(token).equals(username);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private SecretKey getSigningKey() {
